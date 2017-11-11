@@ -8,7 +8,7 @@ This is the first version and it will be update with more features soon.
 * __Timer setting in Wooocommerce__
 
 
-For now the initial timer is set at 180 seocnds  and second try at 120 seconds.
+For now the initial timer at checkout is set at 180 seocnds  and second try at 120 seconds.
 you can change this in the public/partials/stellar-public-display.php
 
 line 84-93 
@@ -28,5 +28,5 @@ var count = 180;
  ### ///////////////////////////////////////////// ###
 
 
-here you will be able to change the timer from 180 and 120 to whatever you want.
+here you will be able to change the timer at checkout from 180 and 120 to whatever you want.
         
