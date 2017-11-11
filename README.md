@@ -4,8 +4,8 @@ This is a plugin for wordpress woocommerce use at checkout
 This is the first version and it will be update with more features soon.
 
 ROAD MAP
-1, Add QRCODE
-2, Timer setting in Wooocommerce
+* __Add QRCODE__
+* __Timer setting in Wooocommerce__
 
 
 For now the initial timer is set at 180 seocnds  and second try at 120 seconds.
