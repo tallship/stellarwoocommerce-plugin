@@ -3,7 +3,7 @@ This is a plugin for wordpress woocommerce use at checkout
 
 This is the first version and it will be update with more features soon.
 
-##ROAD MAP##
+### ROAD MAP ###
 * __Add QRCODE__
 * __Timer setting in Wooocommerce__
 
@@ -13,7 +13,7 @@ you can change this in the public/partials/stellar-public-display.php
 
 line 84-93 
 you will have something like this 
-##///////////////////////////////////////////////##
+### /////////////////////////////////////////////// ###
 var count = 180;
   var score = 1;  
   function timer()
@@ -25,7 +25,7 @@ var count = 180;
         score = 2;
         count = 120;
         
-##/////////////////////////////////////////////##
+ ### ///////////////////////////////////////////// ###
 
 
 here you will be able to change the timer from 180 and 120 to whatever you want.
