@@ -43,16 +43,13 @@ if($success==1){?>
 </div>
 <?php }?>
 <form method="post">
-    <div class="row col-md-7">
-  <div class="form-group">
-    <label for="email">Api key:</label>
-    <input type="text" class="form-control" name="api_key" value="<?php echo $api_key; ?>" id="api_key">
-  </div>
-  <button type="submit" class="btn btn-primary" name="submit">Submit</button>
-  
-    </div>
-<div class="row col-md-6">
-    <h4>Note : Use [staller_front] shortcode in which page you want to display</h4>
+  <div class="row col-md-6">
+    <h4>Stay up to date with the latest from MWPLUG <br />
+    <a href="xlm.mwplug.com">Stellar Lumen version </a>
+    <br />
+    <a href="mwplug.com">Mobius version </a><br />
+    <b> Support: info@mwplug.com<br />
+    Donate :GDM4HME3REOISXX4NK5NE3ZGGVAM47O5XDYNKF7F7AYMBCMP2CFGSIQP</b> </h4>
 </div>
 </form>
 <br/><br/>
