@@ -19,10 +19,10 @@
  * For more information, see the following discussion:
  * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
- * @link       http://xlm.mwplug.com
+ * @link       http://www.stellar.com
  * @since      1.0.0
  *
- * @package           Stellar Lumens 
+ * @package    Stellar
  */
 
 // If uninstall not called from WordPress, then exit.

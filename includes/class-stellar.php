@@ -1,15 +1,14 @@
 <?php
-
 /**
  * The file that defines the core plugin class
  *
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       http://xlm.mwplug.com
+ * @link       http://www.stellar.com
  * @since      1.0.0
  *
- * @package           Stellar Lumens 
+ * @package    Stellar
  * @subpackage Stellar/includes
  */
 
@@ -23,9 +22,9 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package           Stellar Lumens 
- * @subpackage Stellar/includes
- * @author     MWPLUG
+ * @package    swplug-plus
+ * @subpackage swplug-plus/includes
+ * @author     SWPLUG PLUS <medium.com/swplug>
  */
 class Stellar {
 
@@ -157,6 +156,16 @@ class Stellar {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
+		
+	    $this->loader->add_action( 'wp_ajax_swplug_get_balance', $plugin_admin , 'swplug_get_balance' );
+	    $this->loader->add_action( 'wp_ajax_nopriv_swplug_get_balance', $plugin_admin , 'swplug_get_balance' );
+
+	    $this->loader->add_action( 'wp_ajax_swplug_delete_last_mobius_order', $plugin_admin , 'swplug_delete_last_mobius_order' );
+	    $this->loader->add_action( 'wp_ajax_nopriv_swplug_delete_last_mobius_order', $plugin_admin , 'swplug_delete_last_mobius_order' );
+
+	    $this->loader->add_action( 'wp_ajax_swplug_use_credits', $plugin_admin , 'swplug_use_credits' );
+	    $this->loader->add_action( 'wp_ajax_nopriv_swplug_use_credits', $plugin_admin , 'swplug_use_credits' );
+
 	}
 
 	/**
@@ -172,6 +181,10 @@ class Stellar {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+
+	
+
 
 	}
 

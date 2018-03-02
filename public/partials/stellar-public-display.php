@@ -1,112 +1,190 @@
 <?php
-
 /**
  * Provide a public-facing view for the plugin
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link       http://xlm.mwplug.com
+ * @link       https://medium.com/swplug
  * @since      1.0.0
  *
- * @package           Stellar Lumens 
- * @subpackage Stellar/public/partials
+ * @package    SWPLUG-Plus
+ * @subpackage SWPLUG-Plus/public/partials
  */
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
-
-<?php 
-
-//global $wpdb;
-//
-//$appTable =  "mobius";
-//global $wpdb;
-//$result = $wpdb->get_results ( "SELECT * FROM ".$appTable );
-//$api_key = $result[0]->api_key;
-//$app_uid = $result[0]->app_uid;
-//$app_credit_charge_per_each_use = $charge_val;
-
-
-?>
 <?php
+    
+    function swplug_getEnabledCurrencies($settings) {
+      $enabledCurrencies = array();
+      foreach ($settings as $key => $value) {
+        if($key!='enabled' && $value == 'yes')
+          $enabledCurrencies[] = $key;
+      }
+      return $enabledCurrencies;
+    }
+
+    function swplug_getCurrencyCode($currency) {
+      $pos = strpos($currency, "(");
+      return trim(substr($currency, 0,$pos));
+    }
+
     $str_1 = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $str_2 = 'aBcEeFgHiJkLmNoPqRstUvWxYz0123456789';
     $memo = substr(str_shuffle($str_1),0, 1) . substr(str_shuffle($str_2),0, 11);
-    // $memo = 'yeBU78sMXZJ5';
+    
+
+    /*
+    * choose random wallet address
+    */
+    $stellar_setting = get_option('woocommerce_stellar_gateway_settings');
+
+    $stellar_wallet_address = $stellar_setting['wallet_address'];
+    $enabledCurrencies = swplug_getEnabledCurrencies($stellar_setting);
+
+    $wallet_address_array = explode(',', $stellar_wallet_address);
+    $k = array_rand($wallet_address_array);
+    $random_wallet_address = $wallet_address_array[$k];
+    
+    /*
+    * dynamic memo timing
+    */
+    $memo_timing = $stellar_setting['memo_timing'];
+
 
 ?>
+
 <div class="container">
   <div class="row">
    <div class="col-md-12 played-games">
-    <h4 class="section-title">Pay to above wallet with memo <strong><label id="memo_lbl"><?php echo $memo; ?></label></strong></h4>
+    <table>
+      <tr>
+        <td style="vertical-align: middle;"><img src='' id="currency_logo" /></td>
+        <td>
+            <div id="currency_options_div" style="display: none;"></div>
+            <div>
+              <select class="form-control currency_options" style="width: 155px;">
+                <option value="">Select currency</option>
+                <?php
+                  foreach ($enabledCurrencies as $currency) {
+                    $currency = str_replace("#", " ", $currency);
+                    $currency = str_replace("$", ".", $currency);
+                    $currency_code = swplug_getCurrencyCode($currency);
+                    ?>
+                      <option value="<?php echo strtoupper($currency_code); ?>"><?php echo strtoupper($currency); ?></option>
+                    <?php
+                  }
+                ?>
+              </select>
+            </div>
+        </td>
+      </tr>
+    </table>
+    <div id="price_content_div" style="display: none;margin-bottom: 1em;">Price to be pay <strong><span id="currency_selected_value"></span> <span id="price_content"></span></strong></div>
+    <input type="button" name="generate_memo" id="generate_memo" value="Get memo"><hr />
+    <div id="memo_container" style="display: none">
+    <h4 class="section-title memo_instructions"><?php echo esc_html( 'Pay to above wallet with memo' ); ?> <strong><label id="memo_lbl"><?php echo $memo; ?></label></strong></h4>
     <form class="form-group">
-        <label for="waiting_loader" id="waiting_loader">Waiting for your transaction.&nbsp;&nbsp;<span id="timing_instruction">
+        <label for="waiting_loader" id="waiting_loader"><?php echo esc_html( 'Waiting for your transaction.' ); ?>&nbsp;&nbsp;<span id="timing_instruction">
       </span> </label>
+      <div id="memo_qrcode"></div>     
     </form>
+    </div>
   </div>
 </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/0.7.3/stellar-sdk.js"></script>
 
+<script src="http://stellarball.com/assets/js/jquery.qrcode.js"></script>
+<script src="http://stellarball.com/assets/js/qrcode.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/0.7.3/stellar-sdk.js"></script>
 <script type="text/javascript">
     
-  
+  jQuery("#wallet_address_lbl").html('<?php echo $random_wallet_address; ?>');
+
+  var wallet_address_random = jQuery("#wallet_address_lbl").html();
+   
   var memo_element = document.getElementById("memo_lbl");
-  memo_element.innerHTML= randomString(12, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-  // memo_element.innerHTML = "v5o1kXhtLbyw";
-  var current_selected_method = '';
-  // When radio button is clicked. 
-  jQuery("input[name='payment_method']").change(function(){
-    
-    current_selected_method = jQuery(this).val();
-    if(jQuery(this).val() == "stellar_gateway") {
-          var counter=setInterval(timer, 1000);
-          // jQuery('#place_order').attr('disabled','disabled');
-          var checkout_btn = "input[name='woocommerce_checkout_place_order']";
-    jQuery(checkout_btn).on('click',function()
-    {
-     
-    if(current_selected_method == "stellar_gateway") {
-         var previous_text = jQuery(this).val();
-         jQuery(checkout_btn).val("Please wait ...");
-         var paymentTo = jQuery("#wallet_address_lbl").html();
-         var memo = jQuery("#memo_lbl").html();
-         checkStellarPaymentStatus(paymentTo,memo);
-    }
-     });
-    }else{
-      jQuery('#place_order').removeAttr('disabled','disabled');
+  /*
+  * when Get memo button click
+  */
+  jQuery("input[name='generate_memo']").click(function(){
+    var selected_currency_option = jQuery('#currency_options').val();
+    if(selected_currency_option != ''){
+        jQuery('#generate_memo').css('display','none');
+        jQuery('#memo_container').css('display','block');
+        memo_element.innerHTML= swplug_randomString(12, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        jQuery('#memo_qrcode').qrcode(""+wallet_address_random + " with memo "+memo_element.innerHTML);
       
+        var current_selected_method = '';
+           current_selected_method = jQuery("input[name='payment_method']:checked").val();
+           if(current_selected_method == "stellar_gateway") {
+              var counter=setInterval(swplug_timer, 1000);
+              var checkout_btn = "input[name='woocommerce_checkout_place_order']";
+              jQuery(checkout_btn).on('click',function()
+              {
+               
+              if(current_selected_method == "stellar_gateway") {
+                   var previous_text = current_selected_method;
+                   jQuery(checkout_btn).val("Please wait ...");
+                   var paymentTo = jQuery("#wallet_address_lbl").html();
+                   var memo = jQuery("#memo_lbl").html();
+                   swplug_checkStellarPaymentStatus(paymentTo,memo);
+              }
+               });
+        }else{
+          jQuery('#place_order').removeAttr('disabled','disabled');
+          
+        }    
     }
-});
+    
+  });
+
   
-  var count = 180;
-  var score = 1;  
-  function timer()
+  
+
+
+
+  
+  var count = <?php echo $memo_timing ?>;
+  var score = 1;
+  var count_another_memo_transaction = 1;  
+  function swplug_timer()
   {
   
   if (count <= 0)
   {
       if(score == 1){
-        score = 2;
-        count = 120;
+       
+        count = <?php echo $memo_timing ?>;
         var paymentTo = jQuery("#wallet_address_lbl").html();
         var memo = jQuery("#memo_lbl").html();
-        checkStellarPaymentStatus(paymentTo,memo);
-        document.getElementById("waiting_loader").innerHTML= "<button type='button' id='get_memo_code' onclick='change_memo_code()'>Get another memo</button>";
+        
+        swplug_checkStellarPaymentStatus(paymentTo,memo);
+        document.getElementById("waiting_loader").innerHTML= "Processing....";
+        
         jQuery('#place_order').removeAttr('disabled','disabled');
         jQuery('#memo_lbl').html('');
+        jQuery('#memo_qrcode').html('');
+        if(count == 0){
+          clearInterval(swplug_timer);
+        }
+         score = 2;
       }
       else{
-        //clearInterval(counter);
+        
+        if(count_another_memo_transaction == 1){
         var paymentTo = jQuery("#wallet_address_lbl").html();
         var memo = jQuery("#memo_lbl").html();
-        checkStellarPaymentStatus(paymentTo,memo);
-        document.getElementById("waiting_loader").innerHTML= " <h3>Time Expired! </h3>";
+        
+        swplug_checkStellarPaymentStatus(paymentTo,memo);
+        document.getElementById("waiting_loader").innerHTML= "Processing...";
         memo_element.innerHTML = '';
+        jQuery('#memo_qrcode').html('');
         jQuery('#place_order').removeAttr('disabled','disabled');
+        count_another_memo_transaction=2;
         return;
+      }
       }
   }
 
@@ -114,13 +192,14 @@
  document.getElementById("timing_instruction").innerHTML=count + " Seconds remaining..."; // watch for spelling
  count=count-1;
 }
-function change_memo_code() {
-    memo_element.innerHTML= randomString(12, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+function swplug_change_memo_code() {
+    memo_element.innerHTML= swplug_randomString(12, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
     document.getElementById("waiting_loader").innerHTML= " Waiting for your transaction.&nbsp;&nbsp;<span id='timing_instruction'></span>";
+    jQuery('#memo_qrcode').qrcode("Pay to site wallet address " + wallet_address_random + " with memo "+memo_element.innerHTML);
    jQuery('#place_order').attr('disabled','disabled');
-    timer();
+    swplug_timer();
 }
-function randomString(length, chars) {
+function swplug_randomString(length, chars) {
     var result = '';
     for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
     return result;
@@ -150,39 +229,82 @@ function randomString(length, chars) {
 
   })();
 
+  function swplug_getPriceValue(currency,woocomerce_products_total) {
+      jQuery("#price_content").html('Please wait ...');
+      jQuery.ajax({
+           type: "GET",
+           url: "https://api.stellarterm.com/v1/ticker.json",
+           success: function(result)
+           {
+            var arr = [];
+            var i = 0;
+             jQuery.each(result.assets, function(index,value){
+                if(value.code == currency){
+                    if(currency == 'XLM'){
+                      if(typeof value.price_USD != undefined && typeof value.price_USD != 'undefined') {
+                        var price_in_usd = woocomerce_products_total / value.price_USD;
+                        jQuery("#price_content").html(''+price_in_usd.toFixed(2));
+                      }
+                    }
+                    else if(currency == 'BTC'){
+                      if(typeof value.price_USD != undefined && typeof value.price_USD != 'undefined') {
+                        var price_btc_usd = value.price_USD;
+                        arr[i++] = price_btc_usd;
+                        if(arr.length > 0){
+                          var lastEl = arr[arr.length-1];
+                          var price_in_usd = woocomerce_products_total / lastEl;
+                          jQuery("#price_content").html(''+price_in_usd.toFixed(3));  
+                        }
+                        
+                      }
+                    }
+                    else {
+                      var price_in_usd = woocomerce_products_total / value.price_USD;
+                      jQuery("#price_content").html(''+price_in_usd.toFixed(2));
+                    }
+                }
+             }); 
+           }
+      });
+  }
+  
   jQuery(document).ready(function()
   {
-    //when stellar already selected on load time
+    
+    /*
+    * when stellar already selected on load time
+    */
+    jQuery(".currency_options").on('change',function()
+    {
+      jQuery("#price_content_div").css('display','block');
+      jQuery("#currency_selected_value").html(jQuery(this).val());
+      var woocommerce_total_amount = jQuery('.order-total .woocommerce-Price-amount').html();
+      var woocomerce_products_total = parseFloat(woocommerce_total_amount.replace(/[^0-9\.]/g, ''), 10);
+      swplug_getPriceValue(jQuery(this).val(),woocomerce_products_total);
+      jQuery("#currency_logo").attr('src','<?php echo plugins_url( 'swplug-plus/images/'); ?>'+jQuery(this).val()+".png");
+    });
+
+
+
     var selected_payment_method = jQuery('input[name=payment_method]:checked').val();
     var checkout_btn = "input[name='woocommerce_checkout_place_order']";
+    
     if(selected_payment_method == "stellar_gateway"){
          jQuery('#place_order').attr('disabled','disabled');
          var paymentTo = jQuery("#wallet_address_lbl").html();
          var memo = jQuery("#memo_lbl").html();
-         var counter=setInterval(timer, 1000);
          var previous_text = jQuery(this).val();
-         jQuery(checkout_btn).val("Please wait ...");
-         // checkStellarPaymentStatus(paymentTo,memo);
+         jQuery(checkout_btn).val("Please wait ...");     
     }
   
-    /*jQuery(checkout_btn).on('click',function()
-    {
-    if(selected_payment_method == "stellar_gateway" && current_selected_method == '') {
-         var previous_text = jQuery(this).val();
-         jQuery(checkout_btn).val("Please wait ...");
-         var paymentTo = jQuery("#wallet_address_lbl").html();
-         var memo = jQuery("#memo_lbl").html();
-         jQuery(checkout_btn).attr('disabled','disabled');
-         var counter=setInterval(timer, 1000);
-         checkStellarPaymentStatus(paymentTo,memo);
-    }
-     }); */
   }); 
 
-  function checkStellarPaymentStatus(paymentTo,memo)
+  function swplug_checkStellarPaymentStatus(paymentTo,memo)
   {
+    
+    console.log(memo);
+    console.log(paymentTo);
     var server = new StellarSdk.Server('https://horizon.stellar.org');
-    var api_url = "<?php echo  plugins_url( 'stellar_api.php', dirname(__FILE__) )   ?>"; 
     var accountId = paymentTo;
     if(!isPublicKeyValid(accountId))
     {
@@ -205,12 +327,11 @@ function randomString(length, chars) {
       .call()
       .then(function (accountResult) {
         records = accountResult.records;
-        // console.log(records.length);
-        jQuery.ajaxQ.abortAll();
+        
         jQuery.each(accountResult.records,function(index,value)
         {
           payment = value;
-          // console.log(payment);
+          
           // if(payment.to == paymentTo)
           {
             var transactionLink = payment._links.self.href;
@@ -221,31 +342,30 @@ function randomString(length, chars) {
             .transaction(transactionHash)
             .call()
             .then(function (transactionResult) {
-              console.log(transactionResult);
+              console.log("Here comes with "+recordCounter);
               if(typeof transactionResult.memo!='undefined' && transactionResult.memo==reference_number)
               {
-                // console.log(jQuery("form[name='checkout']").length);
                 jQuery("form[name='checkout']").submit();
+                return;
               }
               else if(recordCounter==records.length)
               {
-                // alert('Payment is not made.');
-                // jQuery.ajaxQ.abortAll();
-                /*jQuery.ajax({
-                url : api_url,
-                data : {action:"delete-last-mobius-order"},
-                success : function(response){
-                  // alert("OID is "+response);
+                alert('Payment is not made.');
+                document.getElementById("waiting_loader").innerHTML= "<button type='button' id='get_memo_code' onclick='swplug_change_memo_code()'>Get another memo</button>";
+                if(count_another_memo_transaction == 2){
+                  document.getElementById("waiting_loader").innerHTML= " <h4>Time Expired! </h4>";
                 }
-                });*/
+                jQuery.ajaxQ.abortAll();
               }
+
+              recordCounter++;
 
             })
             .catch(function (err) {
               console.log(err)
             })
           }
-          recordCounter++;
+          
         });
       })
       .catch(function (err) {
@@ -255,7 +375,6 @@ function randomString(length, chars) {
 
   function isPublicKeyValid(accountId)
   {
-    // var accountId = 'GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ';
     var strKey = StellarSdk.StrKey;
     var server = new StellarSdk.Server('https://horizon.stellar.org');
     return strKey.isValidEd25519PublicKey(accountId);
@@ -271,5 +390,7 @@ function randomString(length, chars) {
       return '';
     }
   }
+  
+  
 
 </script>

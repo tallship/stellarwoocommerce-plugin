@@ -3,11 +3,11 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       http://xlm.mwplug.com
+ * @link       https://medium.com/swplug
  * @since      1.0.0
  *
- * @package           Stellar Lumens 
- * @subpackage Stellar/public
+ * @package    SWPLUG
+ * @subpackage SWPLUG/public
  */
 
 /**
@@ -16,9 +16,9 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
- * @package           Stellar Lumens 
- * @subpackage Stellar/public
- * @author     MWPLUG
+ * @package    SWPLUG
+ * @subpackage SWPLUG/public
+ * @author     Ali <manknojiya121@gmail.com>
  */
 class Stellar_Public {
 
@@ -52,16 +52,10 @@ class Stellar_Public {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
                 
-                
-                //generate shortcode for front
+                /**
+				* Generate shortcode for front
+				*/
                 function get_stellar_front($atts) {
-                    // for shortcode parameter
-//                    $atts = shortcode_atts(
-//		array(
-//			'charge' => '',
-//		), $atts, 'get_stellar_front' );
-//
-//                    $charge_val = $atts['charge'];                
                     include( plugin_dir_path( __FILE__ ) . 'partials/stellar-public-display.php'); 
                 }
                add_shortcode('stellar_front', 'get_stellar_front');
@@ -111,6 +105,7 @@ class Stellar_Public {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/stellar-public.js', array( 'jquery' ), $this->version, false );
+		
 
 	}
 
