@@ -1,13 +1,12 @@
 <?php
-
 /**
  * Fired during plugin deactivation
  *
- * @link       http://xlm.mwplug.com
+ * @link       http://www.stellar.com
  * @since      1.0.0
  *
- * @package           Stellar Lumens 
- * @subpackage Stellar/includes
+ * @package    swplug-plus
+ * @subpackage swplug-plus/includes
  */
 
 /**
@@ -16,9 +15,9 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package           Stellar Lumens 
- * @subpackage Stellar/includes
- * @author     MWPLUG
+ * @package    swplug-plus
+ * @subpackage swplug-plus/includes
+ * @author     SWPLUG PLUS <medium.com/swplug>
  */
 class Stellar_Deactivator {
 
@@ -31,11 +30,9 @@ class Stellar_Deactivator {
 	 */
 	public static function deactivate() {
                 
-             global $wpdb;
-             $table_name = "stellar";
-             $sql = "DROP TABLE IF EXISTS $table_name;";
-             $wpdb->query($sql);
-             delete_option("my_plugin_db_version");
+            delete_option( 'woocommerce_stellar_gateway_settings' );
+            delete_option( 'woocommerce_mobius_gateway_settings' );
+            
 	}
 
 }

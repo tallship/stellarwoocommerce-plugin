@@ -6,11 +6,11 @@
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link       http://xlm.mwplug.com
+ * @link       http://www.stellar.com
  * @since      1.0.0
  *
- * @package           Stellar Lumens 
- * @subpackage Stellar/includes
+ * @package    swplug-plus
+ * @subpackage swplug-plus/includes
  */
 
 /**
@@ -20,9 +20,9 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package           Stellar Lumens 
- * @subpackage Stellar/includes
- * @author     MWPLUG
+ * @package    swplug-plus
+ * @subpackage swplug-plus/includes
+ * @author     SWPLUG PLUS <medium.com/swplug>
  */
 class Stellar_i18n {
 
