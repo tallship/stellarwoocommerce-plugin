@@ -1,5 +1,6 @@
 <?php
-
+// use \ZuluCrypto\MobiusApi\Mobius;
+// use \ZuluCrypto\MobiusApi\Exception\MobiusApiException;
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -61,9 +62,12 @@ class Stellar_Admin {
                 /**
                 * For mobius plugin
                 */
-				include(plugin_dir_path( __FILE__ ) . 'woocommerce-gateway-mobius.php');
+				//include(plugin_dir_path( __FILE__ ) . 'woocommerce-gateway-mobius.php');
 
-                
+                // require_once( plugin_dir_path( __FILE__ ) . 'mobius/vendor/autoload.php');
+				
+
+
                 function get_mobius_front($atts) {
                 	$atts = shortcode_atts(
                 		array(
@@ -74,9 +78,9 @@ class Stellar_Admin {
                 	include( plugin_dir_path( __FILE__ ) . 'mobius_front.php');                 
                 }
                 add_shortcode('mobius_front', 'get_mobius_front');
-                
 
-            }
+
+      }          
 
 	/**
 	 * Register the stylesheets for the admin area.
@@ -124,6 +128,8 @@ class Stellar_Admin {
 		
 		wp_localize_script( $this->plugin_name, 'myplugin' , array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 
+		
+
 
 	}
 
@@ -147,6 +153,26 @@ class Stellar_Admin {
 	public function swplug_get_balance() {
 
 		check_ajax_referer( 'get_balance_secure', 'security' );
+
+		/*$API_KEY = sanitize_text_field($_REQUEST['api_key']);
+
+		$APP_UID = sanitize_text_field($_REQUEST['app_uid']);
+
+		$EMAIL = sanitize_text_field($_REQUEST['email']);
+
+		// Main object for working with the API
+		$mobius = new Mobius($API_KEY);
+
+		// Retrieves an object to work with the DApp store
+		$appStore = $mobius->getAppStore($APP_UID);
+		
+		// Easily query a user's balance
+		$userBalance = $appStore->getBalance($EMAIL);*/
+
+
+		//Use 5 MOBI and get the user's updated balance
+		//$userBalance = $appStore->useBalance($EMAIL, 5);
+		
 		$url = "https://mobius.network/api/v1/app_store/balance?";
 		   $params = array(
 		        "api_key" => sanitize_text_field($_REQUEST['api_key']),

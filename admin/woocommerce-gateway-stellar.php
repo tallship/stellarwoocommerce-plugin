@@ -125,6 +125,13 @@ function wc_stellar_gateway_init() {
 					'default' => 'yes'
 				),
 
+				'usd#(stronghold$co)' => array(
+					'title'   => __( 'USD(STRONGHOLD.CO)', 'wc-gateway-stellar' ),
+					'type'    => 'checkbox',
+					'label'   => __( 'Enable USD', 'wc-gateway-stellar' ),
+					'default' => 'yes'
+				),
+
 				'slt#(smartlands)' => array(
 					'title'   => __( 'SLT (SMARTLANDS)', 'wc-gateway-stellar' ),
 					'type'    => 'checkbox',
@@ -139,31 +146,10 @@ function wc_stellar_gateway_init() {
 					'default' => 'yes'
 				),
 
-				'eqd#(equid)' => array(
-					'title'   => __( 'EQD (EQUID)', 'wc-gateway-stellar' ),
-					'type'    => 'checkbox',
-					'label'   => __( 'Enable EQD', 'wc-gateway-stellar' ),
-					'default' => 'yes'
-				),
-
-				'rmt#(sureremit)' => array(
-					'title'   => __( 'RMT (SureRemit)', 'wc-gateway-stellar' ),
-					'type'    => 'checkbox',
-					'label'   => __( 'Enable RMT', 'wc-gateway-stellar' ),
-					'default' => 'yes'
-				),
-
 				'cny#(ripplefox)' => array(
 					'title'   => __( 'CNY (RIPPLEFOX)', 'wc-gateway-stellar' ),
 					'type'    => 'checkbox',
 					'label'   => __( 'Enable CNY', 'wc-gateway-stellar' ),
-					'default' => 'yes'
-				),
-
-				'hkdc#(cryptomover)' => array(
-					'title'   => __( 'HKDC (CRYPTOMOVER)', 'wc-gateway-stellar' ),
-					'type'    => 'checkbox',
-					'label'   => __( 'Enable HKDC', 'wc-gateway-stellar' ),
 					'default' => 'yes'
 				),
 
@@ -174,24 +160,17 @@ function wc_stellar_gateway_init() {
 					'default' => 'yes'
 				),
 
+				'btc#(stronghold$co)' => array(
+					'title'   => __( 'BTC (STRONGHOLD.CO)', 'wc-gateway-stellar' ),
+					'type'    => 'checkbox',
+					'label'   => __( 'Enable BTC', 'wc-gateway-stellar' ),
+					'default' => 'yes'
+				),
+
 				'eurt#(tempo)' => array(
 					'title'   => __( 'EURT (TEMPO)', 'wc-gateway-stellar' ),
 					'type'    => 'checkbox',
 					'label'   => __( 'Enable EURT', 'wc-gateway-stellar' ),
-					'default' => 'yes'
-				),
-
-				'kin#(apay)' => array(
-					'title'   => __( 'KIN (APAY)', 'wc-gateway-stellar' ),
-					'type'    => 'checkbox',
-					'label'   => __( 'Enable KIN', 'wc-gateway-stellar' ),
-					'default' => 'yes'
-				),
-
-				'btc#(apay)' => array(
-					'title'   => __( 'BTC (APAY)', 'wc-gateway-stellar' ),
-					'type'    => 'checkbox',
-					'label'   => __( 'Enable BTC', 'wc-gateway-stellar' ),
 					'default' => 'yes'
 				),
 
@@ -209,6 +188,35 @@ function wc_stellar_gateway_init() {
 					'default' => 'yes'
 				),
 
+				'pedi#(pedity$com)' => array(
+					'title'   => __( 'PEDI (PEDITY.COM)', 'wc-gateway-stellar' ),
+					'type'    => 'checkbox',
+					'label'   => __( 'Enable PEDI', 'wc-gateway-stellar' ),
+					'default' => 'yes'
+				),
+
+				'fras#(frasindo$com)' => array(
+					'title'   => __( 'FRAS (FRASINDO.COM)', 'wc-gateway-stellar' ),
+					'type'    => 'checkbox',
+					'label'   => __( 'Enable FRAS', 'wc-gateway-stellar' ),
+					'default' => 'yes'
+				),
+
+				'eth#(stronghold$co)' => array(
+					'title'   => __( 'ETH (STRONGHOLD.COM)', 'wc-gateway-stellar' ),
+					'type'    => 'checkbox',
+					'label'   => __( 'Enable ETH', 'wc-gateway-stellar' ),
+					'default' => 'yes'
+				),
+
+				'azgl#(azgreenlife$com)' => array(
+					'title'   => __( 'AZGL (AZGREENLIFE.COM)', 'wc-gateway-stellar' ),
+					'type'    => 'checkbox',
+					'label'   => __( 'Enable AZGL', 'wc-gateway-stellar' ),
+					'default' => 'yes'
+				),
+
+
 				'title' => array(
 					'title'       => __( 'Title', 'wc-gateway-stellar' ),
 					'type'        => 'text',
@@ -223,6 +231,16 @@ function wc_stellar_gateway_init() {
 					'description' => __( 'Pay with SWPLUG-PLUS', 'wc-gateway-stellar' ),
 					'default'     => __( 'Pay with SWPLUG-PLUS', 'wc-gateway-stellar' ),
 					'desc_tip'    => true,
+				),
+
+				'default_currency' => array(
+					'title'       => __( 'Default Currency', 'wc-gateway-stellar' ),
+                    'type'        => 'select',
+                    'class'       => 'wc-enhanced-select',
+                    'description' => __( 'This currency will be used as default on checkout page', 'wc-gateway-stellar' ),
+                    'default'     => 'XLM',
+                    'desc_tip'    => true,
+                    'options'     => array('XLM' => 'XLM (STELLAR.ORG)', 'USD' => 'USD(STRONGHOLD.CO)','SLT' => 'SLT (SMARTLANDS)', 'MOBI' => 'MOBI (MOBIUS NETWORK)','CNY' => 'CNY (RIPPLEFOX)', 'XRP' => 'XRP (VCBEAR)','BTC' => 'BTC (STRONGHOLD.CO)', 'EURT' => 'EURT (TEMPO)','STEM' => 'STEM (STEMCHAIN)', 'PHP' => 'PHP (COINS.ASIA)','PEDI' => 'PEDI (PEDITY.COM)', 'FRAS' => 'FRAS (FRASINDO.COM)','ETH' => 'ETH (STRONGHOLD.COM)', 'AZGL' => 'AZGL (AZGREENLIFE.COM)'),
 				),
 				
 			) );
