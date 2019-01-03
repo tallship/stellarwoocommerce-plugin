@@ -38,9 +38,11 @@
     * choose random wallet address
     */
     $stellar_setting = get_option('woocommerce_stellar_gateway_settings');
-
+    
     $stellar_wallet_address = $stellar_setting['wallet_address'];
     $enabledCurrencies = swplug_getEnabledCurrencies($stellar_setting);
+
+    $default_currency = $stellar_setting['default_currency'];
 
     $wallet_address_array = explode(',', $stellar_wallet_address);
     $k = array_rand($wallet_address_array);
@@ -71,7 +73,7 @@
                     $currency = str_replace("$", ".", $currency);
                     $currency_code = swplug_getCurrencyCode($currency);
                     ?>
-                      <option value="<?php echo strtoupper($currency_code); ?>"><?php echo strtoupper($currency); ?></option>
+                      <option <?php if(strtoupper($default_currency) == strtoupper($currency_code)) { echo 'selected';} ?> value="<?php echo strtoupper($currency_code); ?>"><?php echo strtoupper($currency); ?></option>
                     <?php
                   }
                 ?>
@@ -87,7 +89,7 @@
     <form class="form-group">
         <label for="waiting_loader" id="waiting_loader"><?php echo esc_html( 'Waiting for your transaction.' ); ?>&nbsp;&nbsp;<span id="timing_instruction">
       </span> </label>
-      <div id="memo_qrcode"></div>     
+      <!-- <div id="memo_qrcode"></div>  -->    
     </form>
     </div>
   </div>
@@ -95,8 +97,8 @@
 </div>
 
 
-<script src="http://stellarball.com/assets/js/jquery.qrcode.js"></script>
-<script src="http://stellarball.com/assets/js/qrcode.js"></script>
+<!-- <script src="http://stellarball.com/assets/js/jquery.qrcode.js"></script>
+<script src="http://stellarball.com/assets/js/qrcode.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/0.7.3/stellar-sdk.js"></script>
 <script type="text/javascript">
     
@@ -114,7 +116,9 @@
         jQuery('#generate_memo').css('display','none');
         jQuery('#memo_container').css('display','block');
         memo_element.innerHTML= swplug_randomString(12, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-        jQuery('#memo_qrcode').qrcode(""+wallet_address_random + " with memo "+memo_element.innerHTML);
+        // jQuery('#memo_qrcode').qrcode(""+wallet_address_random + " with memo "+memo_element.innerHTML);
+
+        // jQuery('#memo_qrcode').qrcode(wallet_address_random + " or pay*paycheck.com");
       
         var current_selected_method = '';
            current_selected_method = jQuery("input[name='payment_method']:checked").val();
@@ -165,7 +169,7 @@
         
         jQuery('#place_order').removeAttr('disabled','disabled');
         jQuery('#memo_lbl').html('');
-        jQuery('#memo_qrcode').html('');
+        // jQuery('#memo_qrcode').html('');
         if(count == 0){
           clearInterval(swplug_timer);
         }
@@ -180,7 +184,7 @@
         swplug_checkStellarPaymentStatus(paymentTo,memo);
         document.getElementById("waiting_loader").innerHTML= "Processing...";
         memo_element.innerHTML = '';
-        jQuery('#memo_qrcode').html('');
+        // jQuery('#memo_qrcode').html('');
         jQuery('#place_order').removeAttr('disabled','disabled');
         count_another_memo_transaction=2;
         return;
@@ -195,7 +199,8 @@
 function swplug_change_memo_code() {
     memo_element.innerHTML= swplug_randomString(12, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
     document.getElementById("waiting_loader").innerHTML= " Waiting for your transaction.&nbsp;&nbsp;<span id='timing_instruction'></span>";
-    jQuery('#memo_qrcode').qrcode("Pay to site wallet address " + wallet_address_random + " with memo "+memo_element.innerHTML);
+    // jQuery('#memo_qrcode').qrcode("Pay to site wallet address " + wallet_address_random + " with memo "+memo_element.innerHTML);
+  // jQuery('#memo_qrcode').qrcode(wallet_address_random + " or pay*paycheck.com");
    jQuery('#place_order').attr('disabled','disabled');
     swplug_timer();
 }
@@ -231,6 +236,7 @@ function swplug_randomString(length, chars) {
 
   function swplug_getPriceValue(currency,woocomerce_products_total) {
       jQuery("#price_content").html('Please wait ...');
+
       jQuery.ajax({
            type: "GET",
            url: "https://api.stellarterm.com/v1/ticker.json",
@@ -239,8 +245,9 @@ function swplug_randomString(length, chars) {
             var arr = [];
             var i = 0;
              jQuery.each(result.assets, function(index,value){
+
                 if(value.code == currency){
-                    if(currency == 'XLM'){
+                    if(currency == 'XLM' || currency == 'USD' || currency == 'ETH'){
                       if(typeof value.price_USD != undefined && typeof value.price_USD != 'undefined') {
                         var price_in_usd = woocomerce_products_total / value.price_USD;
                         jQuery("#price_content").html(''+price_in_usd.toFixed(2));
@@ -259,11 +266,42 @@ function swplug_randomString(length, chars) {
                       }
                     }
                     else {
+                      
                       var price_in_usd = woocomerce_products_total / value.price_USD;
                       jQuery("#price_content").html(''+price_in_usd.toFixed(2));
                     }
                 }
              }); 
+           }
+      });
+  }
+
+  function swplug_getPriceValueAZGL(currency,woocomerce_products_total) {
+      jQuery("#price_content").html('Please wait ...');
+
+      jQuery.ajax({
+           type: "GET",
+           url: "https://stellar.api.stellarport.io/Ticker",
+           success: function(result)
+           {
+                var xlm_per_azgl = result.AZGL_XLM.open;
+                jQuery.ajax({
+                 type: "GET",
+                 url: "https://api.stellarterm.com/v1/ticker.json",
+                 success: function(result2)
+                 {
+                          var arr = [];
+                          var i = 0;
+                           jQuery.each(result2.assets, function(index,value){
+                                  if(value.code == 'XLM'){
+                                    if(typeof value.price_USD != undefined && typeof value.price_USD != 'undefined') {
+                                      var price_in_usd = (woocomerce_products_total / value.price_USD) / xlm_per_azgl;
+                                      jQuery("#price_content").html(''+price_in_usd.toFixed(2));
+                                    }
+                                  }
+                              });
+                   }
+              });
            }
       });
   }
@@ -280,7 +318,13 @@ function swplug_randomString(length, chars) {
       jQuery("#currency_selected_value").html(jQuery(this).val());
       var woocommerce_total_amount = jQuery('.order-total .woocommerce-Price-amount').html();
       var woocomerce_products_total = parseFloat(woocommerce_total_amount.replace(/[^0-9\.]/g, ''), 10);
-      swplug_getPriceValue(jQuery(this).val(),woocomerce_products_total);
+      if(jQuery(this).val() == 'AZGL') {
+        swplug_getPriceValueAZGL(jQuery(this).val(),woocomerce_products_total);
+      }
+      else{
+        swplug_getPriceValue(jQuery(this).val(),woocomerce_products_total);  
+      }
+      
       jQuery("#currency_logo").attr('src','<?php echo plugins_url( 'swplug-plus/images/'); ?>'+jQuery(this).val()+".png");
     });
 
@@ -296,81 +340,112 @@ function swplug_randomString(length, chars) {
          var previous_text = jQuery(this).val();
          jQuery(checkout_btn).val("Please wait ...");     
     }
+
+    setTimeout(function(){
+      jQuery(".currency_options").trigger('change');
+    },1000);
   
   }); 
 
   function swplug_checkStellarPaymentStatus(paymentTo,memo)
   {
-    
+
     console.log(memo);
     console.log(paymentTo);
-    var server = new StellarSdk.Server('https://horizon.stellar.org');
-    var accountId = paymentTo;
-    if(!isPublicKeyValid(accountId))
-    {
-      alert('Invalid wallet address.');
-      return;
-    }
-    var reference_number = memo;
-    var payments = server.transactions().forAccount(accountId).limit(100);
-    var lastToken = loadLastPagingToken();
-    var recordCounter = 1;
-    if (lastToken) {
-      payments.cursor(lastToken);
-    }
-
-    records = [];
-
-    server.transactions()
-      .forAccount(paymentTo)
-      .limit(100)
-      .call()
-      .then(function (accountResult) {
-        records = accountResult.records;
+    jQuery.ajax({
+      type: "GET",
+      url: "https://api.stellar.expert/api/explorer/public/payments?memo="+memo,
+      cache: false,
+      dataType: "json",
+      success: function(data){
         
-        jQuery.each(accountResult.records,function(index,value)
-        {
-          payment = value;
-          
-          // if(payment.to == paymentTo)
+        if(data._embedded.records.length > 0) {
+          alert('Payment is made successfully.');
+          jQuery("form[name='checkout']").submit();
+          return;
+        }
+        else
           {
-            var transactionLink = payment._links.self.href;
-            // console.log("transaction link is "+transactionLink);
-            var splitTransaction = transactionLink.split("/");
-            var transactionHash = splitTransaction[(splitTransaction.length-1)];
-            server.transactions()
-            .transaction(transactionHash)
-            .call()
-            .then(function (transactionResult) {
-              console.log("Here comes with "+recordCounter);
-              if(typeof transactionResult.memo!='undefined' && transactionResult.memo==reference_number)
-              {
-                jQuery("form[name='checkout']").submit();
-                return;
-              }
-              else if(recordCounter==records.length)
-              {
-                alert('Payment is not made.');
-                document.getElementById("waiting_loader").innerHTML= "<button type='button' id='get_memo_code' onclick='swplug_change_memo_code()'>Get another memo</button>";
-                if(count_another_memo_transaction == 2){
-                  document.getElementById("waiting_loader").innerHTML= " <h4>Time Expired! </h4>";
-                }
-                jQuery.ajaxQ.abortAll();
-              }
-
-              recordCounter++;
-
-            })
-            .catch(function (err) {
-              console.log(err)
-            })
+            alert('Payment is not made.');
+            document.getElementById("waiting_loader").innerHTML= "<button type='button' id='get_memo_code' onclick='swplug_change_memo_code()'>Get another memo</button>";
+                  if(count_another_memo_transaction == 2){
+                    document.getElementById("waiting_loader").innerHTML= " <h4>Time Expired! </h4>";
+                  }
+            return false;
+            jQuery.ajaxQ.abortAll();
           }
-          
-        });
-      })
-      .catch(function (err) {
-        console.error(err);
+      }
     });
+    
+    // console.log(memo);
+    // console.log(paymentTo);
+    // var server = new StellarSdk.Server('https://horizon.stellar.org');
+    // var accountId = paymentTo;
+    // if(!isPublicKeyValid(accountId))
+    // {
+    //   alert('Invalid wallet address.');
+    //   return;
+    // }
+    // var reference_number = memo;
+    // var payments = server.transactions().forAccount(accountId).limit(100);
+    // var lastToken = loadLastPagingToken();
+    // var recordCounter = 1;
+    // if (lastToken) {
+    //   payments.cursor(lastToken);
+    // }
+
+    // records = [];
+
+    // server.transactions()
+    //   .forAccount(paymentTo)
+    //   .limit(100)
+    //   .call()
+    //   .then(function (accountResult) {
+    //     records = accountResult.records;
+        
+    //     jQuery.each(accountResult.records,function(index,value)
+    //     {
+    //       payment = value;
+          
+    //       // if(payment.to == paymentTo)
+    //       {
+    //         var transactionLink = payment._links.self.href;
+    //         // console.log("transaction link is "+transactionLink);
+    //         var splitTransaction = transactionLink.split("/");
+    //         var transactionHash = splitTransaction[(splitTransaction.length-1)];
+    //         server.transactions()
+    //         .transaction(transactionHash)
+    //         .call()
+    //         .then(function (transactionResult) {
+    //           console.log("Here comes with "+recordCounter);
+    //           if(typeof transactionResult.memo!='undefined' && transactionResult.memo==reference_number)
+    //           {
+    //             jQuery("form[name='checkout']").submit();
+    //             return;
+    //           }
+    //           else if(recordCounter==records.length)
+    //           {
+    //             alert('Payment is not made.');
+    //             document.getElementById("waiting_loader").innerHTML= "<button type='button' id='get_memo_code' onclick='swplug_change_memo_code()'>Get another memo</button>";
+    //             if(count_another_memo_transaction == 2){
+    //               document.getElementById("waiting_loader").innerHTML= " <h4>Time Expired! </h4>";
+    //             }
+    //             jQuery.ajaxQ.abortAll();
+    //           }
+
+    //           recordCounter++;
+
+    //         })
+    //         .catch(function (err) {
+    //           console.log(err)
+    //         })
+    //       }
+          
+    //     });
+    //   })
+    //   .catch(function (err) {
+    //     console.error(err);
+    // });
   }
 
   function isPublicKeyValid(accountId)
