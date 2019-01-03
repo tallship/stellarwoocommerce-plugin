@@ -29,7 +29,9 @@ class Stellar_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-                
-       }
+         global $wp;
+
+         update_option('woocommerce_stellar_gateway_settings', '');
+    }
 
 }
