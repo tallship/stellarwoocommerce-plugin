@@ -15,8 +15,8 @@
  * Plugin Name:       SWPLUG Plus
  * Plugin URI:        https://swplug.com
  * Description:       Leading Wordpress Payment Plugin for Stellar Blockchain. 
- * Version:           1.0.0
- * Author:            SWPLUG PLUS
+ * Version:           1.1.2
+ * Author:            Swplug plus
  * Author URI:        https://medium.com/swplug
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
@@ -30,6 +30,15 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 define( 'SWPLUG_Plus_VERSION', '1.0.0' );
+
+add_filter('plugin_row_meta',  'Register_Plugins_Links', 10, 2);
+function Register_Plugins_Links ($links, $file) {
+               $base = plugin_basename(__FILE__);
+               if ($file == $base) {
+                       $links[] = '<a href="http://swplug.com/logo.png" target="_blank">' . __('Swplug Logo') . '</a>';
+               }
+               return $links;
+       }
 
 /**
  * The code that runs during plugin activation.
